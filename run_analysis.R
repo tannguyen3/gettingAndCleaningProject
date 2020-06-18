@@ -7,14 +7,15 @@ readData <- function(type = "test") {
   fileNames <- sapply(fileNames, paste, type, ".txt", sep= "")
   filePaths <- file.path("UCI HAR Dataset", type, fileNames)
   
-  subjects <- tibble(read.csv(filePaths[1], header = F))
+  subjects <- read.csv(filePaths[1], header = F)
   names(subjects) <- c("subjectid")
   
-  labels <- tibble(read.csv(filePaths[2], header = F))
+  labels <- read.csv(filePaths[2], header = F)
   names(labels) <- c("id")
   
-  set <- tibble(read.csv(filePaths[3], header = F, sep = "", numerals = "no.loss"))
+  set <- read.csv(filePaths[3], header = F, sep = "", numerals = "no.loss")
   names(set) <- featureLabels
+  # only get mean and std variables
   set <-select(set, contains(c("mean", "std")))
   
   # There are features with the same name for example: 382-fBodyAccJerk-bandsEnergy()-1,8; 
@@ -32,3 +33,4 @@ featureLabels <- tibble(read.csv("UCI HAR Dataset/features.txt", header = F, sep
 
 # merge the 2 dataset into one
 data <- rbind(readData("test"), readData("train"))
+data <- tibble(data)
