@@ -10,10 +10,12 @@ readData <- function(type = "test") {
   subjects <- read.csv(filePaths[1], header = F)
   names(subjects) <- c("subjectid")
   
-  labels <- read.csv(filePaths[2], header = F)
+  labels <- read.csv(filePaths[2], header = F, comment.char = "")
   names(labels) <- c("id")
   
-  set <- read.csv(filePaths[3], header = F, sep = "", numerals = "no.loss")
+  set <- read.csv(filePaths[3], header = F, sep = "", numerals = "no.loss"
+                  , comment.char = "", colClasses = rep("numeric", length(featureLabels)))
+  
   names(set) <- featureLabels
   # only get mean and std variables
   set <-select(set, contains(c("mean", "std")))
