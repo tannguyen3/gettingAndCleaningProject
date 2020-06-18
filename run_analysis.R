@@ -1,6 +1,7 @@
 library(dplyr)
 library(tidyr)
 
+# function to read and merge data in one folder.
 readData <- function(type = "test") {
   fileNames <- c("subject_", "y_", "X_")
   fileNames <- sapply(fileNames, paste, type, ".txt", sep= "")
@@ -14,10 +15,13 @@ readData <- function(type = "test") {
   
   set <- tibble(read.csv(filePaths[3], header = F, sep = "", numerals = "no.loss"))
   names(set) <- featureLabels
+  set <-select(set, contains(c("mean", "std")))
   
-  # bug - see why it's only has 480 variables
+  # There are features with the same name for example: 382-fBodyAccJerk-bandsEnergy()-1,8; 
+  # so from 561 features we only get 481 variables. We will not to worry about this as they are not mean and std
   data <- left_join(labels, activitiesLabels)
-  data <- mutate(data, subjects, set) 
+  
+  data <- data %>% mutate(subjects, set) 
   data$type <- type
   data
 }
@@ -26,4 +30,5 @@ activitiesLabels <- tibble(read.csv("UCI HAR Dataset/activity_labels.txt", sep =
 names(activitiesLabels) <- c("id", "activity")
 featureLabels <- tibble(read.csv("UCI HAR Dataset/features.txt", header = F, sep = " "))$V2
 
+# merge the 2 dataset into one
 data <- rbind(readData("test"), readData("train"))
