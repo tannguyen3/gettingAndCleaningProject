@@ -13,7 +13,7 @@ readData <- function(type = "test") {
   labels <- read.csv(filePaths[2], header = F, comment.char = "")
   names(labels) <- c("id")
   
-  set <- read.csv(filePaths[3], header = F, sep = "", numerals = "no.loss"
+  set <- read.csv(filePaths[3], header = F, sep = "", numerals = "no.loss" 
                   , comment.char = "", colClasses = rep("numeric", length(featureLabels)))
   
   names(set) <- featureLabels
@@ -22,10 +22,12 @@ readData <- function(type = "test") {
   
   # There are features with the same name for example: 382-fBodyAccJerk-bandsEnergy()-1,8; 
   # so from 561 features we only get 481 variables. We will not to worry about this as they are not mean and std
-  data <- left_join(labels, activitiesLabels)
+  labels <- left_join(labels, activitiesLabels)
   
-  data <- data %>% mutate(subjects, set) 
-  data$type <- type
+  data <- subjects %>% 
+    mutate(labels, type = type, set) %>% 
+    select(-id)
+    
   data
 }
 
@@ -36,3 +38,12 @@ featureLabels <- tibble(read.csv("UCI HAR Dataset/features.txt", header = F, sep
 # merge the 2 dataset into one
 data <- rbind(readData("test"), readData("train"))
 data <- tibble(data)
+# rename variables. 
+names(data) <- tolower(names(data))
+names(data) <- gsub("\\(\\)", "", names(data))
+names(data) <- gsub("-", "", names(data))
+
+# new tidy data set that has average of each variable for each activity and each subject.
+tidyData <- data %>% 
+  group_by(subjectid, activity) %>% 
+  summarise(across(.cols = -type, mean))
