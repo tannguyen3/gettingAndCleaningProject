@@ -47,3 +47,6 @@ names(data) <- gsub("-", "", names(data))
 tidyData <- data %>% 
   group_by(subjectid, activity) %>% 
   summarise(across(.cols = -type, mean))
+
+#write the tidy data set to tidyData.txt file
+write.table(tidyData, file = "tidyData.txt", row.names = FALSE, sep = " ", qmethod = "double")
